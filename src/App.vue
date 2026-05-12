@@ -1,48 +1,154 @@
 <template>
-  <div id="app">
-    <header>
-      <h1>📝 Список дел</h1>
-      <p>Всего: {{ totalCount }} | Активных: {{ pendingCount }} | Выполнено: {{ completedCount }}</p>
-    </header>
+  <v-app>
+    <v-app-bar color="primary" density="comfortable">
+      <v-app-bar-title class="text-white">
+        <v-icon icon="mdi-checkbook" class="mr-2" />
+        Список дел
+      </v-app-bar-title>
+    </v-app-bar>
 
-    <AppNotification 
-      :message="notification.message" 
-      :type="notification.type" 
-      :visible="notification.visible" 
-      @close="notification.visible = false" 
-    />
+    <v-main class="bg-grey-lighten-4">
+      <v-container class="py-8">
+        <v-row class="mb-6">
+          <v-col cols="12" md="4">
+            <v-card variant="outlined">
+              <v-card-text class="text-center">
+                <div class="text-h4 font-weight-bold text-primary">{{ totalCount }}</div>
+                <div class="text-caption text-grey">Всего задач</div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-card variant="outlined">
+              <v-card-text class="text-center">
+                <div class="text-h4 font-weight-bold text-warning">{{ pendingCount }}</div>
+                <div class="text-caption text-grey">Активных</div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-card variant="outlined">
+              <v-card-text class="text-center">
+                <div class="text-h4 font-weight-bold text-success">{{ completedCount }}</div>
+                <div class="text-caption text-grey">Выполнено</div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
 
-    <div class="add-task">
-      <input 
-        v-model="newTaskTitle" 
-        @keyup.enter="addTask" 
-        placeholder="Что нужно сделать?" 
-        type="text" 
-      />
-      <button @click="addTask" :disabled="!newTaskTitle.trim()">Добавить</button>
-    </div>
+        <v-card class="mb-6">
+          <v-card-text>
+            <v-row align="center">
+              <v-col cols="12" md>
+                <v-text-field
+                  v-model="newTaskTitle"
+                  label="Что нужно сделать?"
+                  placeholder="Введите название задачи..."
+                  prepend-inner-icon="mdi-plus-circle"
+                  variant="outlined"
+                  hide-details
+                  @keyup.enter="addTask"
+                />
+              </v-col>
+              <v-col cols="12" md="auto" class="mt-3 mt-md-0">
+                <v-btn
+                  color="primary"
+                  size="large"
+                  :disabled="!newTaskTitle.trim()"
+                  @click="addTask"
+                  append-icon="mdi-arrow-right"
+                >
+                  Добавить
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
 
-    <div class="task-list">
-      <p v-if="tasks.length === 0">✨ Список пуст. Добавьте первую задачу!</p>
-      <ul v-else>
-        <li v-for="task in tasks" :key="task.id" :class="{ completed: task.completed }">
-          <input type="checkbox" :checked="task.completed" @change="toggleTask(task.id)" />
-          <span class="task-title">{{ task.title }}</span>
-          <button class="remove-btn" @click="removeTask(task.id)">✕</button>
-        </li>
-      </ul>
-    </div>
+        <v-card>
+          <v-card-title>
+            <v-icon icon="mdi-format-list-check" class="mr-2" />
+            Задачи
+          </v-card-title>
+          
+          <v-card-text v-if="tasks.length === 0" class="text-center py-8">
+            <v-icon icon="mdi-clipboard-text-multiple-outline" size="64" color="grey-lighten-1" />
+            <p class="text-grey mt-4">✨ Список пуст. Добавьте первую задачу!</p>
+          </v-card-text>
 
-    <footer>
-      <GithubProfile username="bukabtw" />
-    </footer>
-  </div>
+          <v-list v-else class="bg-grey-lighten-4">
+            <v-list-item
+              v-for="task in tasks"
+              :key="task.id"
+              :class="{ 'bg-white': !task.completed }"
+              class="mb-2 rounded-lg"
+            >
+              <v-row align="center">
+                <v-col cols="auto" class="pr-2">
+                  <v-checkbox
+                    :model-value="task.completed"
+                    @change="toggleTask(task.id)"
+                    :color="task.completed ? 'success' : undefined"
+                    hide-details
+                    density="compact"
+                  />
+                </v-col>
+
+                <v-col>
+                  <v-list-item-title
+                    :class="{
+                      'text-decoration-line-through text-grey': task.completed,
+                      'text-body-1': true
+                    }"
+                  >
+                    {{ task.title }}
+                  </v-list-item-title>
+                </v-col>
+
+                <v-col cols="auto" class="pl-2">
+                  <v-btn
+                    icon="mdi-close"
+                    size="small"
+                    color="error"
+                    variant="text"
+                    @click="removeTask(task.id)"
+                  />
+                </v-col>
+              </v-row>
+            </v-list-item>
+          </v-list>
+        </v-card>
+
+        <v-card class="mt-6" variant="outlined">
+          <GithubProfile username="bukabtw" />
+        </v-card>
+      </v-container>
+
+      <v-snackbar
+        v-model="notification.visible"
+        :color="getNotificationColor(notification.type)"
+        timeout="3000"
+        location="top"
+      >
+        <v-icon :icon="getNotificationIcon(notification.type)" class="mr-2" />
+        {{ notification.message }}
+
+        <template v-slot:actions>
+          <v-btn
+            variant="text"
+            @click="notification.visible = false"
+          >
+            Закрыть
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import GithubProfile from './components/GithubProfile.vue'
-import AppNotification from './components/AppNotification.vue'
 
 const tasks = ref([])
 const newTaskTitle = ref('')
@@ -53,6 +159,16 @@ let notificationTimeout = null
 const completedCount = computed(() => tasks.value.filter(t => t.completed).length)
 const pendingCount = computed(() => tasks.value.filter(t => !t.completed).length)
 const totalCount = computed(() => tasks.value.length)
+
+const getNotificationColor = (type) => {
+  const colors = { info: 'info', success: 'success', error: 'error' }
+  return colors[type] || 'info'
+}
+
+const getNotificationIcon = (type) => {
+  const icons = { info: 'mdi-information', success: 'mdi-check-circle', error: 'mdi-alert-circle' }
+  return icons[type] || 'mdi-information'
+}
 
 const saveToLocalStorage = () => {
   localStorage.setItem('vue-todo-tasks', JSON.stringify(tasks.value))
@@ -111,193 +227,3 @@ const removeTask = (id) => {
 onMounted(loadFromLocalStorage)
 </script>
 
-<style scoped>
-#app header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-#app header h1 {
-  margin: 0 0 10px 0;
-  color: #333;
-  font-size: 2rem;
-}
-
-#app header p {
-  margin: 0;
-  color: #666;
-  font-size: 0.95rem;
-}
-
-#app .add-task {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 25px;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-#app .add-task input {
-  flex: 1;
-  padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-}
-
-#app .add-task input:focus {
-  outline: none;
-  border-color: #667eea;
-}
-
-#app .add-task input::placeholder {
-  color: #aaa;
-}
-
-#app .add-task button {
-  padding: 12px 24px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  white-space: nowrap;
-}
-
-#app .add-task button:hover:not(:disabled) {
-  background: #5a6fd6;
-  transform: translateY(-2px);
-}
-
-#app .add-task button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-#app .task-list {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
-
-#app .task-list p {
-  text-align: center;
-  color: #999;
-  font-size: 1.1rem;
-  margin: 20px 0;
-}
-
-#app .task-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#app .task-list li {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-#app .task-list li:hover {
-  transform: translateX(5px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-#app .task-list li input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  margin-right: 15px;
-  cursor: pointer;
-  accent-color: #667eea;
-}
-
-#app .task-list li .task-title {
-  flex: 1;
-  font-size: 1rem;
-  color: #333;
-  transition: color 0.3s;
-}
-
-#app .task-list li.completed .task-title {
-  text-decoration: line-through;
-  color: #aaa;
-}
-
-#app .task-list li.completed {
-  background: #f0f0f0;
-}
-
-#app .remove-btn {
-  width: 32px;
-  height: 32px;
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s, transform 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#app .remove-btn:hover {
-  background: #c82333;
-  transform: scale(1.1);
-}
-
-#app footer {
-  text-align: center;
-  padding: 20px;
-  border-top: 1px solid #e0e0e0;
-}
-
-@media (max-width: 600px) {
-  #app {
-    padding: 10px;
-  }
-
-  #app header h1 {
-    font-size: 1.5rem;
-  }
-
-  #app .add-task {
-    flex-direction: column;
-  }
-
-  #app .add-task button {
-    width: 100%;
-  }
-
-  #app .task-list li {
-    padding: 12px;
-  }
-
-  #app .task-list li .task-title {
-    font-size: 0.9rem;
-  }
-
-  #app .remove-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-  }
-}
-</style>
