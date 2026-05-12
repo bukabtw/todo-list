@@ -1,126 +1,15 @@
 <template>
-  <v-container class="py-6">
-    <!-- Статистика задач -->
-    <v-row class="mb-6">
-      <v-col cols="12" md="4">
-        <v-card variant="outlined">
-          <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-primary">{{ store.getters.totalCount }}</div>
-            <div class="text-caption text-grey">{{ $t('tasks.total') }}</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-card variant="outlined">
-          <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-warning">{{ store.getters.pendingCount }}</div>
-            <div class="text-caption text-grey">{{ $t('tasks.active') }}</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-card variant="outlined">
-          <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-success">{{ store.getters.completedCount }}</div>
-            <div class="text-caption text-grey">{{ $t('tasks.completed') }}</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+  <BasePage>
+    <template #header>{{ $t('app.title') }}</template>
 
-    <v-card class="mb-6">
-      <v-card-text>
-        <v-row align="center">
-          <v-col cols="12" md>
-            <v-text-field
-              v-model="newTaskTitle"
-              :label="$t('tasks.addPlaceholder')"
-              :placeholder="$t('tasks.addPlaceholder')"
-              prepend-inner-icon="mdi-plus-circle"
-              variant="outlined"
-              hide-details
-              @keyup.enter="handleAddTask"
-            />
-          </v-col>
-          <v-col cols="12" md="auto" class="mt-3 mt-md-0">
-            <v-btn
-              color="primary"
-              size="large"
-              :disabled="!newTaskTitle.trim()"
-              @click="handleAddTask"
-              append-icon="mdi-arrow-right"
-            >
-              {{ $t('tasks.addButton') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-
-    <v-card>
-      <v-card-title>
+    <BaseCard>
+      <template #title>
         <v-icon icon="mdi-format-list-check" class="mr-2" />
-        {{ $t('app.tasks') }}
-      </v-card-title>
-      
-      <v-card-text v-if="store.getters.totalCount === 0" class="text-center py-8">
-        <v-icon icon="mdi-clipboard-text-multiple-outline" size="64" color="grey-lighten-1" />
-        <p class="text-grey mt-4">✨ {{ $t('tasks.emptyList') }}</p>
-      </v-card-text>
-
-      <v-list v-else class="bg-grey-lighten-4">
-        <v-list-item
-          v-for="task in store.getters.allTasks"
-          :key="task.id"
-          :class="{ 'bg-white': !task.completed }"
-          class="mb-2 rounded-lg"
-        >
-          <v-row align="center">
-            <v-col cols="auto" class="pr-2">
-              <v-checkbox
-                :model-value="task.completed"
-                @change="store.dispatch('toggleTask', task.id)"
-                :color="task.completed ? 'success' : undefined"
-                hide-details
-                density="compact"
-              />
-            </v-col>
-
-            <v-col>
-              <v-list-item-title
-                :class="{
-                  'text-decoration-line-through text-grey': task.completed,
-                  'text-body-1': true
-                }"
-              >
-                {{ task.title }}
-              </v-list-item-title>
-            </v-col>
-
-            <v-col cols="auto" class="pl-2">
-              <v-btn
-                icon="mdi-close"
-                size="small"
-                color="error"
-                variant="text"
-                @click="store.dispatch('removeTask', task.id)"
-              />
-            </v-col>
-          </v-row>
-        </v-list-item>
-      </v-list>
-    </v-card>
-
-    <v-btn
-      v-if="store.getters.completedCount > 0"
-      color="error"
-      variant="outlined"
-      class="mt-4"
-      block
-      @click="store.dispatch('clearCompleted')"
-    >
-      {{ $t('tasks.clearCompleted') }} ({{ store.getters.completedCount }})
-    </v-btn>
+        {{ $t('tasks.total') }}: {{ store.getters.totalCount }} 
+        | {{ $t('tasks.active') }}: {{ store.getters.pendingCount }} 
+        | {{ $t('tasks.completed') }}: {{ store.getters.completedCount }}
+      </template>
+    </BaseCard>
 
     <v-snackbar
       v-model="store.state.notification.visible"
@@ -130,29 +19,134 @@
     >
       <v-icon :icon="getNotificationIcon(store.state.notification.type)" class="mr-2" />
       {{ translateNotification(store.state.notification.message) }}
-
       <template v-slot:actions>
-        <v-btn
-          variant="text"
-          @click="store.dispatch('hideNotification')"
-        >
-          {{ $t('notFound.goHome') }}
-        </v-btn>
+        <v-btn variant="text" @click="store.dispatch('hideNotification')">✕</v-btn>
       </template>
     </v-snackbar>
-  </v-container>
+
+    <BaseCard>
+      <v-row align="center">
+        <v-col>
+          <v-text-field
+            v-model="newTaskTitle"
+            :placeholder="$t('tasks.addPlaceholder')"
+            variant="outlined"
+            prepend-icon="mdi-plus-circle"
+            hide-details
+            @keyup.enter="handleAddTask"
+          />
+        </v-col>
+        <v-col cols="auto">
+          <v-btn
+            color="primary"
+            size="large"
+            :disabled="!newTaskTitle.trim()"
+            @click="handleAddTask"
+            append-icon="mdi-arrow-right"
+          >
+            {{ $t('tasks.addButton') }}
+          </v-btn>
+        </v-col>
+      </v-row>
+    </BaseCard>
+
+    <BaseList
+      :items="store.getters.allTasks"
+      :empty-text="$t('tasks.emptyList')"
+      empty-icon="mdi-clipboard-text-multiple-outline"
+    >
+      <template #item="{ item }">
+        <v-list-item
+          :class="item.completed ? 'bg-grey-lighten-3' : 'bg-white'"
+          class="mb-2 rounded-lg"
+          elevation="2"
+        >
+          <template v-slot:prepend>
+            <v-checkbox
+              :model-value="item.completed"
+              @change="store.dispatch('toggleTask', item.id)"
+              :color="item.completed ? 'success' : undefined"
+              hide-details
+              density="compact"
+            />
+          </template>
+          <v-list-item-title 
+            :class="{ 
+              'text-decoration-line-through text-grey': item.completed,
+              'text-body-1': true 
+            }"
+          >
+            {{ item.title }}
+          </v-list-item-title>
+          <template v-slot:append>
+            <v-btn
+              icon="mdi-close"
+              size="small"
+              color="error"
+              variant="text"
+              @click="confirmDelete(item)"
+            />
+          </template>
+        </v-list-item>
+      </template>
+    </BaseList>
+
+    <BaseCard v-if="store.getters.completedCount > 0">
+      <template #title>
+        <v-icon icon="mdi-delete-sweep" class="mr-2" color="error" />
+        Очистка выполненных
+      </template>
+      <template #actions>
+        <v-btn
+          color="error"
+          variant="outlined"
+          block
+          @click="showClearConfirm = true"
+        >
+          {{ $t('tasks.clearCompleted') }} ({{ store.getters.completedCount }})
+        </v-btn>
+      </template>
+    </BaseCard>
+
+    <ConfirmDialog
+      v-model="showDeleteConfirm"
+      @confirm="handleDelete"
+      @cancel="showDeleteConfirm = false"
+    >
+      <template #title>{{ deleteTarget?.title }}</template>
+      <template #confirmText>Удалить</template>
+      <template #cancelText>Отмена</template>
+    </ConfirmDialog>
+
+    <ConfirmDialog
+      v-model="showClearConfirm"
+      @confirm="handleClearCompleted"
+      @cancel="showClearConfirm = false"
+    >
+      <template #title>Очистить выполненные?</template>
+      <template #confirmText>Очистить</template>
+      <template #cancelText>Отмена</template>
+    </ConfirmDialog>
+  </BasePage>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
+import BasePage from '../components/BasePage.vue'
+import BaseCard from '../components/BaseCard.vue'
+import BaseList from '../components/BaseList.vue'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
 
-const { t } = useI18n()
 const store = useStore()
-const newTaskTitle = ref('')
+const { t } = useI18n()
 
-// Функция для перевода сообщений из store
+const newTaskTitle = ref('')
+const showDeleteConfirm = ref(false)
+const showClearConfirm = ref(false)
+const deleteTarget = ref(null)
+
 const translateNotification = (message) => {
   const translations = {
     'Задача добавлена!': t('tasks.taskAdded'),
@@ -160,13 +154,10 @@ const translateNotification = (message) => {
     'Задача отменена': t('tasks.taskCancelled'),
     'Выполненные задачи очищены': t('tasks.completedCleared')
   }
-  
-  // Для удаления — особая обработка
   if (message.includes('удалена')) {
     const title = message.match(/"(.+)"/)?.[1] || ''
     return t('tasks.taskDeleted', { title })
   }
-  
   return translations[message] || message
 }
 
@@ -183,6 +174,24 @@ const getNotificationIcon = (type) => {
 const handleAddTask = () => {
   store.dispatch('addTask', newTaskTitle.value)
   newTaskTitle.value = ''
+}
+
+const confirmDelete = (task) => {
+  deleteTarget.value = task
+  showDeleteConfirm.value = true
+}
+
+const handleDelete = () => {
+  if (deleteTarget.value) {
+    store.dispatch('removeTask', deleteTarget.value.id)
+    deleteTarget.value = null
+  }
+  showDeleteConfirm.value = false
+}
+
+const handleClearCompleted = () => {
+  store.dispatch('clearCompleted')
+  showClearConfirm.value = false
 }
 
 onMounted(() => {

@@ -1,63 +1,56 @@
 <template>
-  <v-container class="py-8">
-    <div class="text-h5 text-center mb-6">
+  <BasePage>
+    <template #header>
       <v-icon icon="mdi-chart-bar" class="mr-2" />
       {{ $t('stats.title') }}
-    </div>
+    </template>
 
     <v-row>
       <v-col cols="12" md="4">
-        <v-card color="primary" class="text-white text-center pa-6" elevation="4">
-          <v-icon size="64" class="mb-2">mdi-check-circle</v-icon>
-          <div class="text-h3 font-weight-bold">{{ store.getters.completedCount }}</div>
-          <div class="text-subtitle-1">{{ $t('stats.completed') }}</div>
-        </v-card>
+        <BaseStatCard
+          color="primary"
+          icon="mdi-check-circle"
+          :value="store.getters.completedCount"
+        >
+          <template #label>{{ $t('stats.completed') }}</template>
+        </BaseStatCard>
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card color="warning" class="text-white text-center pa-6" elevation="4">
-          <v-icon size="64" class="mb-2">mdi-progress-clock</v-icon>
-          <div class="text-h3 font-weight-bold">{{ store.getters.pendingCount }}</div>
-          <div class="text-subtitle-1">{{ $t('stats.pending') }}</div>
-        </v-card>
+        <BaseStatCard
+          color="warning"
+          icon="mdi-progress-clock"
+          :value="store.getters.pendingCount"
+        >
+          <template #label>{{ $t('stats.pending') }}</template>
+        </BaseStatCard>
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card color="info" class="text-white text-center pa-6" elevation="4">
-          <v-icon size="64" class="mb-2">mdi-list-box</v-icon>
-          <div class="text-h3 font-weight-bold">{{ store.getters.totalCount }}</div>
-          <div class="text-subtitle-1">{{ $t('stats.total') }}</div>
-        </v-card>
+        <BaseStatCard
+          color="info"
+          icon="mdi-list-box"
+          :value="store.getters.totalCount"
+        >
+          <template #label>{{ $t('stats.total') }}</template>
+        </BaseStatCard>
       </v-col>
     </v-row>
 
-    <v-card class="mt-6 pa-6" elevation="2">
-      <v-card-title class="text-h6">
-        <v-icon icon="mdi-chart-line" class="mr-2" />
-        {{ $t('stats.progress') }}
-      </v-card-title>
-      
+    <BaseCard :title="$t('stats.progress')">
       <v-progress-linear
         :model-value="progress"
         color="primary"
         height="25"
         rounded
-        class="mt-2"
       >
         <template v-slot:default>
           <span class="text-white font-weight-bold">{{ progress }}%</span>
         </template>
       </v-progress-linear>
-    </v-card>
+    </BaseCard>
 
-    <v-card class="mt-6" v-if="store.getters.completedCount > 0" elevation="2">
-      <v-card-title class="text-h6">
-        <v-icon icon="mdi-check-all" class="mr-2" color="success" />
-        {{ $t('stats.completedList') }}
-      </v-card-title>
-
-      <v-divider />
-
+    <BaseCard v-if="store.getters.completedCount > 0" :title="$t('stats.completedList')">
       <v-list density="compact">
         <v-list-item
           v-for="task in store.getters.completedTasks"
@@ -67,11 +60,9 @@
           <template v-slot:prepend>
             <v-icon icon="mdi-check-circle" color="success" size="small" class="mr-2" />
           </template>
-          
           <v-list-item-title class="text-decoration-line-through text-grey">
             {{ task.title }}
           </v-list-item-title>
-          
           <template v-slot:append>
             <v-chip size="x-small" color="success" variant="tonal">
               {{ $t('tasks.completed') }}
@@ -79,28 +70,30 @@
           </template>
         </v-list-item>
       </v-list>
-    </v-card>
+    </BaseCard>
 
-    <v-card v-else class="mt-6 text-center pa-8" elevation="2">
-      <v-icon icon="mdi-chart-box-outline" size="80" color="grey-lighten-1" />
-      <p class="text-h6 text-grey mt-4">
-        ✨ {{ $t('stats.noTasks') }}
-      </p>
-    </v-card>
-
-    <v-row justify="center" class="mt-6">
-      <v-col cols="auto">
-        <v-btn to="/" color="primary" prepend-icon="mdi-arrow-left" variant="outlined" size="large">
-          {{ $t('app.tasks') }}
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+    <BaseCard v-else>
+      <template #title>
+        <v-icon icon="mdi-chart-box-outline" class="mr-2" color="grey" />
+        {{ $t('stats.completedList') }}
+      </template>
+      <div class="text-center py-8">
+        <v-icon icon="mdi-clipboard-text-outline" size="64" color="grey-lighten-1" />
+        <p class="text-h6 text-grey mt-4">
+          ✨ {{ $t('stats.noTasks') }}
+        </p>
+      </div>
+    </BaseCard>
+  </BasePage>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import BasePage from '../components/BasePage.vue'
+import BaseCard from '../components/BaseCard.vue'
+import BaseList from '../components/BaseList.vue'
+import BaseStatCard from '../components/BaseStatCard.vue'
 
 const store = useStore()
 

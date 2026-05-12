@@ -1,18 +1,11 @@
 <template>
-  <v-container class="py-8">
-    <v-row justify="center">
-      <v-col cols="12" md="8" lg="6">
-        <div class="text-h5 text-center mb-6">
-          <v-icon icon="mdi-github" class="mr-2" />
-          {{ $t('profile.title') }}
-        </div>
-        
-        <GithubProfile username="bukabtw" />
-      </v-col>
-    </v-row>
-  </v-container>
+  <BasePage>
+    <template #header>{{ $t('app.profile') }}</template>
+    <GithubProfile username="bukabtw" />
+  </BasePage>
 </template>
 
 <script setup>
+import BasePage from '../components/BasePage.vue'
 import GithubProfile from '../components/GithubProfile.vue'
 </script>
