@@ -2,7 +2,7 @@
   <v-card class="mx-auto" max-width="400">
     <v-card-text v-if="loading" class="text-center py-8">
       <v-progress-circular indeterminate color="primary" size="64" />
-      <p class="text-grey mt-4">Загрузка...</p>
+      <p class="text-grey mt-4">{{ $t('profile.loading') }}</p>
     </v-card-text>
 
     <v-alert v-else-if="error" type="error" variant="tonal" class="ma-4">
@@ -39,16 +39,16 @@
           <v-col cols="6">
             <div class="text-h6 font-weight-bold">
               <v-icon icon="mdi-account-group" size="small" class="mr-1" />
-              {{ profile.followers }}
+              {{ $n(profile.followers) }}
             </div>
-            <div class="text-caption text-grey">Подписчиков</div>
+            <div class="text-caption text-grey">{{ $t('profile.followers') }}</div>
           </v-col>
           <v-col cols="6">
             <div class="text-h6 font-weight-bold">
               <v-icon icon="mdi-calendar" size="small" class="mr-1" />
-              {{ formatDate(profile.created_at) }}
+              {{ $d(new Date(profile.created_at), 'short') }}
             </div>
-            <div class="text-caption text-grey">Дата регистрации</div>
+            <div class="text-caption text-grey">{{ $t('profile.registered') }}</div>
           </v-col>
         </v-row>
       </v-card-text>
@@ -62,7 +62,7 @@
           rel="noopener noreferrer"
           append-icon="mdi-open-in-new"
         >
-          Перейти в профиль
+          {{ $t('profile.goToProfile') }}
         </v-btn>
       </v-card-actions>
     </v-card-text>
@@ -71,6 +71,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   username: {
@@ -85,15 +88,6 @@ const loading = ref(true)
 const error = ref(false)
 const errorMessage = ref('')
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ru-RU', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-
 const fetchProfile = async () => {
   loading.value = true
   error.value = false
@@ -102,8 +96,8 @@ const fetchProfile = async () => {
     if (!response.ok) {
       error.value = true
       errorMessage.value = response.status === 404 
-        ? 'Пользователь не найден' 
-        : 'Ошибка загрузки профиля'
+        ? t('profile.notFound') 
+        : t('profile.error')
       return
     }
     profile.value = await response.json()

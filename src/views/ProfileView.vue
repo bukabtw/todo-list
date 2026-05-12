@@ -4,7 +4,7 @@
       <v-col cols="12" md="8" lg="6">
         <div class="text-h5 text-center mb-6">
           <v-icon icon="mdi-github" class="mr-2" />
-          Профиль разработчика
+          {{ $t('profile.title') }}
         </div>
         
         <GithubProfile username="bukabtw" />

@@ -3,7 +3,7 @@
     <v-app-bar color="primary" density="comfortable">
       <v-app-bar-title class="text-white">
         <v-icon icon="mdi-checkbook" class="mr-2" />
-        Список дел
+        {{ $t('app.title') }}
       </v-app-bar-title>
 
       <v-spacer />
@@ -16,7 +16,7 @@
           prepend-icon="mdi-check-circle"
           class="mx-1"
         >
-          <span class="d-none d-md-inline">Задачи</span>
+          <span class="d-none d-md-inline">{{ $t('app.tasks') }}</span>
         </v-btn>
 
         <v-btn
@@ -26,7 +26,7 @@
           prepend-icon="mdi-chart-bar"
           class="mx-1"
         >
-          <span class="d-none d-md-inline">Статистика</span>
+          <span class="d-none d-md-inline">{{ $t('app.stats') }}</span>
         </v-btn>
 
         <v-btn
@@ -36,7 +36,7 @@
           prepend-icon="mdi-github"
           class="mx-1"
         >
-          <span class="d-none d-md-inline">Профиль</span>
+          <span class="d-none d-md-inline">{{ $t('app.profile') }}</span>
         </v-btn>
 
         <v-btn
@@ -46,7 +46,17 @@
           prepend-icon="mdi-information"
           class="mx-1"
         >
-          <span class="d-none d-md-inline">О проекте</span>
+          <span class="d-none d-md-inline">{{ $t('app.about') }}</span>
+        </v-btn>
+
+        <v-btn
+          @click="toggleLocale"
+          size="small"
+          class="ml-2"
+          variant="tonal"
+        >
+          <v-icon icon="mdi-web" class="mr-1" />
+          {{ currentLocale.toUpperCase() }}
         </v-btn>
       </template>
     </v-app-bar>
@@ -63,7 +73,7 @@
       <v-container fluid>
         <v-row align="center" justify="center">
           <v-col cols="12" class="text-center">
-            <span>© {{ new Date().getFullYear() }} - Кирилл Букарев | Производственная практика</span>
+            <span>© {{ new Date().getFullYear() }} - {{ $t('app.footer') }}</span>
           </v-col>
           <v-col cols="12" class="text-center mt-2">
             <v-btn
@@ -82,6 +92,17 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
+
+const currentLocale = computed(() => locale.value)
+
+const toggleLocale = () => {
+  locale.value = locale.value === 'ru' ? 'en' : 'ru'
+  localStorage.setItem('app-locale', locale.value)
+}
 </script>
 
 <style>

@@ -1,0 +1,64 @@
+{
+  "app": {
+    "title": "Список дел",
+    "tasks": "Задачи",
+    "profile": "Профиль",
+    "about": "О проекте",
+    "stats": "Статистика",
+    "footer": "Кирилл Букарев | Производственная практика"
+  },
+  "tasks": {
+    "addPlaceholder": "Что нужно сделать?",
+    "addButton": "Добавить",
+    "emptyList": "Список пуст. Добавьте первую задачу!",
+    "clearCompleted": "Очистить выполненные",
+    "total": "Всего",
+    "active": "Активных",
+    "completed": "Выполнено",
+    "taskAdded": "Задача добавлена!",
+    "taskCompleted": "Задача выполнена",
+    "taskCancelled": "Задача отменена",
+    "taskDeleted": "Задача \"{title}\" удалена",
+    "completedCleared": "Выполненные задачи очищены"
+  },
+  "stats": {
+    "title": "Статистика",
+    "completed": "Выполнено",
+    "pending": "В процессе",
+    "total": "Всего",
+    "progress": "Прогресс выполнения",
+    "completedList": "Выполненные задачи",
+    "noTasks": "Нет задач для отображения статистики"
+  },
+  "about": {
+    "title": "О проекте \"Список дел\"",
+    "description": "Этот проект создан в рамках производственной практики.",
+    "technologies": "Технологии",
+    "goal": "Цель проекта:",
+    "goalDescription": "Изучение фреймворка Vue 3 и экосистемы инструментов для создания интерактивных веб-приложений.",
+    "techVue": "Vue 3 (Composition API)",
+    "techVite": "Vite - современный сборщик",
+    "techVuetify": "Vuetify 3 - UI-библиотека",
+    "techRouter": "Vue Router 4 - роутинг",
+    "techStorage": "localStorage - хранение данных",
+    "techGithub": "GitHub API - интеграция"
+  },
+  "profile": {
+    "title": "Профиль разработчика",
+    "loading": "Загрузка...",
+    "notFound": "Пользователь не найден",
+    "error": "Ошибка загрузки",
+    "registered": "Зарегистрирован",
+    "followers": "Подписчиков",
+    "goToProfile": "Перейти в профиль"
+  },
+  "notFound": {
+    "title": "Страница не найдена",
+    "goHome": "На главную"
+  },
+  "language": {
+    "switch": "Язык",
+    "ru": "Русский",
+    "en": "English"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "app": {
+    "title": "To-Do List",
+    "tasks": "Tasks",
+    "profile": "Profile",
+    "about": "About",
+    "stats": "Statistics",
+    "footer": "Kirill Bukarev | Internship"
+  },
+  "tasks": {
+    "addPlaceholder": "What needs to be done?",
+    "addButton": "Add",
+    "emptyList": "The list is empty. Add your first task!",
+    "clearCompleted": "Clear completed",
+    "total": "Total",
+    "active": "Active",
+    "completed": "Done",
+    "taskAdded": "Task added!",
+    "taskCompleted": "Task completed",
+    "taskCancelled": "Task undone",
+    "taskDeleted": "Task \"{title}\" deleted",
+    "completedCleared": "Completed tasks cleared"
+  },
+  "stats": {
+    "title": "Statistics",
+    "completed": "Done",
+    "pending": "In progress",
+    "total": "Total",
+    "progress": "Completion progress",
+    "completedList": "Completed tasks",
+    "noTasks": "No tasks to show statistics"
+  },
+  "about": {
+    "title": "About \"To-Do List\"",
+    "description": "This project was created as part of an internship.",
+    "technologies": "Technologies",
+    "goal": "Project Goal:",
+    "goalDescription": "Learning the Vue 3 framework and ecosystem of tools for creating interactive web applications.",
+    "techVue": "Vue 3 (Composition API)",
+    "techVite": "Vite - modern build tool",
+    "techVuetify": "Vuetify 3 - UI library",
+    "techRouter": "Vue Router 4 - routing",
+    "techStorage": "localStorage - data storage",
+    "techGithub": "GitHub API - integration"
+  },
+  "profile": {
+    "title": "Developer Profile",
+    "loading": "Loading...",
+    "notFound": "User not found",
+    "error": "Loading error",
+    "registered": "Registered",
+    "followers": "Followers",
+    "goToProfile": "Go to profile"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "goHome": "Go home"
+  },
+  "language": {
+    "switch": "Language",
+    "ru": "Русский",
+    "en": "English"
+  }
+}

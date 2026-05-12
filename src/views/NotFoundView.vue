@@ -4,14 +4,14 @@
     
     <h1 class="text-h2 mt-4 text-grey">404</h1>
     
-    <p class="text-h5 text-grey mt-2">Страница не найдена</p>
+    <p class="text-h5 text-grey mt-2">{{ $t('notFound.title') }}</p>
     
     <p class="text-body-1 text-grey mt-4" style="max-width: 400px; margin: 0 auto;">
-      Похоже, вы зашли по неверному адресу. Вернитесь на главную страницу.
+      {{ $t('notFound.goHome') }}
     </p>
     
     <v-btn color="primary" to="/" class="mt-6" size="large" prepend-icon="mdi-home">
-      На главную
+      {{ $t('notFound.goHome') }}
     </v-btn>
   </v-container>
 </template>

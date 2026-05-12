@@ -5,6 +5,8 @@ import router from './router'
 
 import store from './store'
 
+import i18n from './i18n'
+
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -32,4 +34,4 @@ const vuetify = createVuetify({
   },
 })
 
-createApp(App).use(vuetify).use(router).use(store).mount('#app')
+createApp(App).use(vuetify).use(router).use(store).use(i18n).mount('#app')

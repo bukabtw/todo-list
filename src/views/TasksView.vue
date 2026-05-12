@@ -6,7 +6,7 @@
         <v-card variant="outlined">
           <v-card-text class="text-center">
             <div class="text-h4 font-weight-bold text-primary">{{ store.getters.totalCount }}</div>
-            <div class="text-caption text-grey">Всего задач</div>
+            <div class="text-caption text-grey">{{ $t('tasks.total') }}</div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -14,7 +14,7 @@
         <v-card variant="outlined">
           <v-card-text class="text-center">
             <div class="text-h4 font-weight-bold text-warning">{{ store.getters.pendingCount }}</div>
-            <div class="text-caption text-grey">Активных</div>
+            <div class="text-caption text-grey">{{ $t('tasks.active') }}</div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -22,7 +22,7 @@
         <v-card variant="outlined">
           <v-card-text class="text-center">
             <div class="text-h4 font-weight-bold text-success">{{ store.getters.completedCount }}</div>
-            <div class="text-caption text-grey">Выполнено</div>
+            <div class="text-caption text-grey">{{ $t('tasks.completed') }}</div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -34,8 +34,8 @@
           <v-col cols="12" md>
             <v-text-field
               v-model="newTaskTitle"
-              label="Что нужно сделать?"
-              placeholder="Введите название задачи..."
+              :label="$t('tasks.addPlaceholder')"
+              :placeholder="$t('tasks.addPlaceholder')"
               prepend-inner-icon="mdi-plus-circle"
               variant="outlined"
               hide-details
@@ -50,7 +50,7 @@
               @click="handleAddTask"
               append-icon="mdi-arrow-right"
             >
-              Добавить
+              {{ $t('tasks.addButton') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -60,12 +60,12 @@
     <v-card>
       <v-card-title>
         <v-icon icon="mdi-format-list-check" class="mr-2" />
-        Задачи
+        {{ $t('app.tasks') }}
       </v-card-title>
       
       <v-card-text v-if="store.getters.totalCount === 0" class="text-center py-8">
         <v-icon icon="mdi-clipboard-text-multiple-outline" size="64" color="grey-lighten-1" />
-        <p class="text-grey mt-4">✨ Список пуст. Добавьте первую задачу!</p>
+        <p class="text-grey mt-4">✨ {{ $t('tasks.emptyList') }}</p>
       </v-card-text>
 
       <v-list v-else class="bg-grey-lighten-4">
@@ -119,7 +119,7 @@
       block
       @click="store.dispatch('clearCompleted')"
     >
-      Очистить выполненные ({{ store.getters.completedCount }})
+      {{ $t('tasks.clearCompleted') }} ({{ store.getters.completedCount }})
     </v-btn>
 
     <v-snackbar
@@ -129,14 +129,14 @@
       location="top"
     >
       <v-icon :icon="getNotificationIcon(store.state.notification.type)" class="mr-2" />
-      {{ store.state.notification.message }}
+      {{ translateNotification(store.state.notification.message) }}
 
       <template v-slot:actions>
         <v-btn
           variant="text"
           @click="store.dispatch('hideNotification')"
         >
-          Закрыть
+          {{ $t('notFound.goHome') }}
         </v-btn>
       </template>
     </v-snackbar>
@@ -144,11 +144,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const store = useStore()
 const newTaskTitle = ref('')
+
+// Функция для перевода сообщений из store
+const translateNotification = (message) => {
+  const translations = {
+    'Задача добавлена!': t('tasks.taskAdded'),
+    'Задача выполнена': t('tasks.taskCompleted'),
+    'Задача отменена': t('tasks.taskCancelled'),
+    'Выполненные задачи очищены': t('tasks.completedCleared')
+  }
+  
+  // Для удаления — особая обработка
+  if (message.includes('удалена')) {
+    const title = message.match(/"(.+)"/)?.[1] || ''
+    return t('tasks.taskDeleted', { title })
+  }
+  
+  return translations[message] || message
+}
 
 const getNotificationColor = (type) => {
   const colors = { info: 'info', success: 'success', error: 'error' }
