@@ -53,7 +53,6 @@
         </v-row>
       </v-card-text>
 
-      <!-- Кнопка перехода в профиль -->
       <v-card-actions class="justify-center">
         <v-btn
           variant="outlined"

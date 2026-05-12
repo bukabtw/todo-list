@@ -1,9 +1,9 @@
 {
   "name": "todo-list",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Vue 3 To-Do List приложение с GitHub профилем и уведомлениями",
+  "description": "Vue 3 To-Do List приложение с Vuetify 3 и Vue Router 4",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "vue": "^3.5.34",
+    "vue-router": "^4.5.1",
     "vuetify": "^4.0.7"
   },
   "devDependencies": {
@@ -19,3 +20,4 @@
     "vite": "^8.0.12"
   }
 }
+
