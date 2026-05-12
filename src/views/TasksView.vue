@@ -1,10 +1,11 @@
 <template>
   <v-container class="py-6">
+    <!-- Статистика задач -->
     <v-row class="mb-6">
       <v-col cols="12" md="4">
         <v-card variant="outlined">
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-primary">{{ totalCount }}</div>
+            <div class="text-h4 font-weight-bold text-primary">{{ store.getters.totalCount }}</div>
             <div class="text-caption text-grey">Всего задач</div>
           </v-card-text>
         </v-card>
@@ -12,7 +13,7 @@
       <v-col cols="12" md="4">
         <v-card variant="outlined">
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-warning">{{ pendingCount }}</div>
+            <div class="text-h4 font-weight-bold text-warning">{{ store.getters.pendingCount }}</div>
             <div class="text-caption text-grey">Активных</div>
           </v-card-text>
         </v-card>
@@ -20,7 +21,7 @@
       <v-col cols="12" md="4">
         <v-card variant="outlined">
           <v-card-text class="text-center">
-            <div class="text-h4 font-weight-bold text-success">{{ completedCount }}</div>
+            <div class="text-h4 font-weight-bold text-success">{{ store.getters.completedCount }}</div>
             <div class="text-caption text-grey">Выполнено</div>
           </v-card-text>
         </v-card>
@@ -38,7 +39,7 @@
               prepend-inner-icon="mdi-plus-circle"
               variant="outlined"
               hide-details
-              @keyup.enter="addTask"
+              @keyup.enter="handleAddTask"
             />
           </v-col>
           <v-col cols="12" md="auto" class="mt-3 mt-md-0">
@@ -46,7 +47,7 @@
               color="primary"
               size="large"
               :disabled="!newTaskTitle.trim()"
-              @click="addTask"
+              @click="handleAddTask"
               append-icon="mdi-arrow-right"
             >
               Добавить
@@ -62,14 +63,14 @@
         Задачи
       </v-card-title>
       
-      <v-card-text v-if="tasks.length === 0" class="text-center py-8">
+      <v-card-text v-if="store.getters.totalCount === 0" class="text-center py-8">
         <v-icon icon="mdi-clipboard-text-multiple-outline" size="64" color="grey-lighten-1" />
         <p class="text-grey mt-4">✨ Список пуст. Добавьте первую задачу!</p>
       </v-card-text>
 
       <v-list v-else class="bg-grey-lighten-4">
         <v-list-item
-          v-for="task in tasks"
+          v-for="task in store.getters.allTasks"
           :key="task.id"
           :class="{ 'bg-white': !task.completed }"
           class="mb-2 rounded-lg"
@@ -78,7 +79,7 @@
             <v-col cols="auto" class="pr-2">
               <v-checkbox
                 :model-value="task.completed"
-                @change="toggleTask(task.id)"
+                @change="store.dispatch('toggleTask', task.id)"
                 :color="task.completed ? 'success' : undefined"
                 hide-details
                 density="compact"
@@ -102,7 +103,7 @@
                 size="small"
                 color="error"
                 variant="text"
-                @click="removeTask(task.id)"
+                @click="store.dispatch('removeTask', task.id)"
               />
             </v-col>
           </v-row>
@@ -110,19 +111,30 @@
       </v-list>
     </v-card>
 
+    <v-btn
+      v-if="store.getters.completedCount > 0"
+      color="error"
+      variant="outlined"
+      class="mt-4"
+      block
+      @click="store.dispatch('clearCompleted')"
+    >
+      Очистить выполненные ({{ store.getters.completedCount }})
+    </v-btn>
+
     <v-snackbar
-      v-model="notification.visible"
-      :color="getNotificationColor(notification.type)"
+      v-model="store.state.notification.visible"
+      :color="getNotificationColor(store.state.notification.type)"
       timeout="3000"
       location="top"
     >
-      <v-icon :icon="getNotificationIcon(notification.type)" class="mr-2" />
-      {{ notification.message }}
+      <v-icon :icon="getNotificationIcon(store.state.notification.type)" class="mr-2" />
+      {{ store.state.notification.message }}
 
       <template v-slot:actions>
         <v-btn
           variant="text"
-          @click="notification.visible = false"
+          @click="store.dispatch('hideNotification')"
         >
           Закрыть
         </v-btn>
@@ -132,17 +144,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useStore } from 'vuex'
 
-const tasks = ref([])
+const store = useStore()
 const newTaskTitle = ref('')
-const notification = reactive({ message: '', type: 'info', visible: false })
-const nextId = ref(1)
-let notificationTimeout = null
-
-const completedCount = computed(() => tasks.value.filter(t => t.completed).length)
-const pendingCount = computed(() => tasks.value.filter(t => !t.completed).length)
-const totalCount = computed(() => tasks.value.length)
 
 const getNotificationColor = (type) => {
   const colors = { info: 'info', success: 'success', error: 'error' }
@@ -154,59 +160,12 @@ const getNotificationIcon = (type) => {
   return icons[type] || 'mdi-information'
 }
 
-const saveToLocalStorage = () => {
-  localStorage.setItem('vue-todo-tasks', JSON.stringify(tasks.value))
-  localStorage.setItem('vue-todo-nextId', String(nextId.value))
-}
-
-const loadFromLocalStorage = () => {
-  const savedTasks = localStorage.getItem('vue-todo-tasks')
-  const savedNextId = localStorage.getItem('vue-todo-nextId')
-  if (savedTasks) tasks.value = JSON.parse(savedTasks)
-  if (savedNextId) nextId.value = parseInt(savedNextId, 10)
-}
-
-const showNotification = (message, type = 'info') => {
-  if (notificationTimeout) {
-    clearTimeout(notificationTimeout)
-  }
-  
-  notification.message = message
-  notification.type = type
-  notification.visible = true
-
-  notificationTimeout = setTimeout(() => {
-    notification.visible = false
-  }, 3000)
-}
-
-const addTask = () => {
-  const title = newTaskTitle.value.trim()
-  if (!title) return
-  tasks.value.push({ id: nextId.value++, title, completed: false })
-  saveToLocalStorage()
+const handleAddTask = () => {
+  store.dispatch('addTask', newTaskTitle.value)
   newTaskTitle.value = ''
-  showNotification('Задача добавлена!', 'success')
 }
 
-const toggleTask = (id) => {
-  const task = tasks.value.find(t => t.id === id)
-  if (task) {
-    task.completed = !task.completed
-    saveToLocalStorage()
-    showNotification(`Задача ${task.completed ? 'выполнена' : 'отменена'}`, 'success')
-  }
-}
-
-const removeTask = (id) => {
-  const index = tasks.value.findIndex(t => t.id === id)
-  if (index !== -1) {
-    const title = tasks.value[index].title
-    tasks.value.splice(index, 1)
-    saveToLocalStorage()
-    showNotification(`Задача "${title}" удалена`, 'error')
-  }
-}
-
-onMounted(loadFromLocalStorage)
+onMounted(() => {
+  store.dispatch('loadTasks')
+})
 </script>

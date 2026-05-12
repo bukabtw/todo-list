@@ -20,6 +20,12 @@ const routes = [
     meta: { title: 'Профиль' }
   },
   {
+    path: '/stats',
+    name: 'stats',
+    component: () => import('../views/StatsView.vue'),
+    meta: { title: 'Статистика' }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('../views/NotFoundView.vue'),

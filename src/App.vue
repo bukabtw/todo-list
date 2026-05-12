@@ -20,6 +20,16 @@
         </v-btn>
 
         <v-btn
+          to="/stats"
+          variant="text"
+          color="white"
+          prepend-icon="mdi-chart-bar"
+          class="mx-1"
+        >
+          <span class="d-none d-md-inline">Статистика</span>
+        </v-btn>
+
+        <v-btn
           to="/profile"
           variant="text"
           color="white"
